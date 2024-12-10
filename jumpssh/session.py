@@ -335,6 +335,7 @@ class SSHSession(object):
             output = StringIO()
             try:
                 # wait until command finished running or timeout is reached
+                buffer = ""  # Temporary buffer to store partial lines
                 while True:
                     got_chunk = False
                     readq, _, _ = select.select([channel], [], [], timeout)
@@ -342,11 +343,15 @@ class SSHSession(object):
                         if c.recv_ready():
                             data = channel.recv(len(c.in_buffer)).decode('utf-8')
                             output.write(data)
+                            buffer += data
                             got_chunk = True
 
                             # print output all along the command is running
-                            if not silent and continuous_output and len(data) > 0:
-                                print(data)
+                            if not silent and continuous_output and len(buffer) > 0:
+                                while "\n" in buffer:
+                                    line, buffer = buffer.split("\n", 1)  # Extract one complete line
+                                    # Log or print only the complete line
+                                    logger.info(line)
 
                             if input_data and channel.send_ready():
                                 # We received a potential prompt.
@@ -354,6 +359,11 @@ class SSHSession(object):
                                     # pattern text matching current output => send input data
                                     if re.search(pattern, data):
                                         channel.send(input_data[pattern] + '\n')
+
+                    # Write any remaining partial data in the buffer
+                    if not silent and continuous_output and len(buffer) > 0:
+                        logger.info(buffer)
+                        buffer = ""  # Clear the buffer after logging its content
 
                     # remote process has exited and returned an exit status
                     if not got_chunk and channel.exit_status_ready() and not channel.recv_ready():
