@@ -1,6 +1,6 @@
 __title__ = 'jumpssh'
 __description__ = 'Python library for remote ssh calls through a gateway.'
-__version__ = '1.6.5'
+__version__ = '1.6.5+cnis'
 
 __author__ = 'Thibaud Castaing'
 __author_email__ = 't-cas@users.noreply.github.com'
