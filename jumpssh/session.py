@@ -222,7 +222,8 @@ class SSHSession(object):
             success_exit_code=0,
             retry=0,
             retry_interval=5,
-            keep_retry_history=False
+            keep_retry_history=False,
+            environment=None
     ):
         """ Run command on the remote host and return result locally
 
@@ -247,6 +248,13 @@ class SSHSession(object):
         :param retry_interval: number of seconds between each retry
         :param keep_retry_history: if True, all retries results are kept and accessible in return result
             default is False as we don't want to save by default all output for all retries especially for big output
+        :param dict environment:
+            a dict of shell environment variables, to be merged into the
+            default environment that the remote command executes within.
+
+            .. warning::
+                Servers may silently reject some environment variables; see the
+                warning in `.Channel.set_environment_variable` for details.
         :raises TimeoutError: if command run longer than the specified timeout
         :raises TypeError: if `cmd` parameter is neither a string neither a list of string
         :raises SSHException: if current SSHSession is already closed
@@ -316,6 +324,8 @@ class SSHSession(object):
 
             channel.set_combine_stderr(True)
             channel.get_pty()
+            if environment:
+                channel.update_environment(environment)
             channel.exec_command(my_cmd)
 
             # prepare timer for timeout
