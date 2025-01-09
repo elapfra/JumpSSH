@@ -351,7 +351,7 @@ class SSHSession(object):
                                 while "\n" in buffer:
                                     line, buffer = buffer.split("\n", 1)  # Extract one complete line
                                     # Log or print only the complete line
-                                    logger.info(line)
+                                    logger.info(line.lstrip('\r').lstrip('\n'))
 
                             if input_data and channel.send_ready():
                                 # We received a potential prompt.
@@ -362,7 +362,7 @@ class SSHSession(object):
 
                     # Write any remaining partial data in the buffer
                     if not silent and continuous_output and len(buffer) > 0:
-                        logger.info(buffer)
+                        logger.info(buffer.lstrip('\r').lstrip('\n'))
                         buffer = ""  # Clear the buffer after logging its content
 
                     # remote process has exited and returned an exit status
