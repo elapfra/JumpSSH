@@ -347,7 +347,7 @@ class SSHSession(object):
                             got_chunk = True
 
                             # print output all along the command is running
-                            if not silent and continuous_output and len(buffer) > 0:
+                            if continuous_output and len(buffer) > 0:
                                 while "\n" in buffer:
                                     line, buffer = buffer.split("\n", 1)  # Extract one complete line
                                     # Log or print only the complete line
@@ -361,7 +361,7 @@ class SSHSession(object):
                                         channel.send(input_data[pattern] + '\n')
 
                     # Write any remaining partial data in the buffer
-                    if not silent and continuous_output and len(buffer) > 0:
+                    if continuous_output and len(buffer) > 0:
                         logger.info(buffer.lstrip('\r').lstrip('\n'))
                         buffer = ""  # Clear the buffer after logging its content
 
